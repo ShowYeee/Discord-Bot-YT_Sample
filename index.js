@@ -3,6 +3,8 @@ const client = new Client();
 const { prefix, token } = require('./config.json');
 const fs = require("fs");
 const queue = new Map();
+const aws = require('aws-sdk');
+
 client.commends = new Collection();
 client.ytcommends = new Collection();
 
@@ -68,4 +70,4 @@ client.on('message', msg => {
  
 });
 
-client.login(token);
+client.login(process.env.token); //如果要架在heroku要使用的參數
