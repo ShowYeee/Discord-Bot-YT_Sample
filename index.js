@@ -65,9 +65,8 @@ client.on('message', msg => {
     let ytcmd = client.ytcommends.get(commend.slice(prefix.length));
     
     if(cmd) cmd.run(client, msg, args, Attachment);
-    if(ytcmd) ytcmd.run(msg, serverQueue, queue);
+    if(ytcmd && msg.content.startsWith(prefix)) ytcmd.run(msg, serverQueue, queue);
     
- 
 });
 
-client.login(process.env.token); //如果要架在heroku要使用的參數
+client.login(token); 

@@ -111,17 +111,19 @@ var queueContruct = {};
         });
     }else{
         const songInfo = await ytdl.getInfo(args[1]);
+        console.log(songInfo);
         const song = {
             title: songInfo.title,
             url: songInfo.video_url,
             duration: formatSecond(songInfo.length_seconds),
+         
         };
         if(!serverQueue){
             queueContruct.songs.push(song);
         }else{
             serverQueue.songs.push(song);
         }
-        message.channel.send(`✔️  **${song.title}**  ${song.duration} 已加入播放佇列`);
+        message.channel.send(`✔️  **${song.title}**  ${song.duration} 已加入播放佇列`);  
     }
 
     //呼叫播放函式

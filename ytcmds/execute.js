@@ -76,9 +76,8 @@ module.exports.run = async (message, serverQueue, queue) => {
             title: songInfo.title,
             url: songInfo.video_url,
             duration: formatSecond(songInfo.length_seconds),
+            isLive: songInfo.player_response.videoDetails.isLive,
         };
-
-        
         if(!serverQueue){
             queueContruct.songs.push(song);
         }else{
@@ -111,17 +110,35 @@ module.exports.run = async (message, serverQueue, queue) => {
         }
         console.log('Now playing :' + song.title + "(" + song.duration + ")"); 
         message.channel.send(`:loud_sound:   開始播放  **${song.title}**  (${song.duration})`);
-        //若server端網速太慢會造成影片播到最後10~15秒突然停止播放的情況，必須設定highWaterMark參數 (Reftence : https://github.com/fent/node-ytdl-core/issues/402)
-        const dispatcher = serverQueue.connection.playStream(ytdl(song.url, { filter: 'audioonly',highWaterMark: 1<<25 }))
-        .on('end', () => {
-            console.log('Music ended!');
-            serverQueue.songs.shift();
-            play(guild, serverQueue.songs[0],message);
-        })
-        .on('error', error => {
-            console.error(error);
-        });
-        dispatcher.setVolumeLogarithmic(serverQueue.volume/5);  
+        
+        if(song.isLive == true){
+            message.channel.send(`:ballot_box_with_check:    目前播放的為 Live 內容，目前處於測試中，可能會有撥放中斷或無聲的狀況`);
+            const dispatcher = serverQueue.connection.playStream(ytdl(song.url, { quality: [91,92,93,94,95] }))
+            .on('end', () => {
+                console.log('Music ended!');
+                serverQueue.songs.shift();
+                play(guild, serverQueue.songs[0],message);
+            })
+            .on('error', error => {
+                console.error(error);
+            });
+            console.log("Playing Live")
+            dispatcher.setVolumeLogarithmic(serverQueue.volume/5); 
+
+        }else{
+            //若server端網速太慢會造成影片播到最後10~15秒突然停止播放的情況，必須設定highWaterMark參數 (Reftence : https://github.com/fent/node-ytdl-core/issues/402)
+            const dispatcher = serverQueue.connection.playStream(ytdl(song.url, { filter: 'audioonly',highWaterMark: 1<<25 }))
+            .on('end', () => {
+                console.log('Music ended!');
+                serverQueue.songs.shift();
+                play(guild, serverQueue.songs[0],message);
+            })
+            .on('error', error => {
+                console.error(error);
+            });
+            dispatcher.setVolumeLogarithmic(serverQueue.volume/5); 
+        }
+
     }
     
     function formatSecond(secs) {          
