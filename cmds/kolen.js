@@ -1,5 +1,6 @@
 module.exports.run = async (client, msg, arg, Attachment) => {
-    var attachment = new Attachment('./image/kolen.jpg');
+    var rng = require("../rngimage.js");
+    var attachment = new Attachment(rng.rngimage('kolen'));
     msg.channel.send(attachment); 
 }
 module.exports.help ={
